@@ -1,0 +1,22 @@
+{
+ "align_labels_right": 0, 
+ "creation": "2018-07-28 00:47:07.799641", 
+ "custom_format": 1, 
+ "disabled": 0, 
+ "doc_type": "Sales Invoice", 
+ "docstatus": 0, 
+ "doctype": "Print Format", 
+ "font": "Default", 
+ "html": "{% set page_height = \"7.4in\" %}\n{% include \"templates/includes/pf_si_payment_receipt.html\" %}\n\n{% block footer %}\n<p>[footer text]</p>\n{% endblock %}  ", 
+ "idx": 0, 
+ "line_breaks": 0, 
+ "modified": "2018-07-28 05:08:18.859045", 
+ "modified_by": "Administrator", 
+ "module": "Sagolsem Customization", 
+ "name": "Sales Invoice Payment Receipt", 
+ "owner": "Administrator", 
+ "print_format_builder": 0, 
+ "print_format_type": "Server", 
+ "show_section_headings": 0, 
+ "standard": "Yes"
+}

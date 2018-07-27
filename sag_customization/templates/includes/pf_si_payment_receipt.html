@@ -1,0 +1,151 @@
+<style>
+@media screen {
+  .print-format {
+    width: 5.8in;
+    padding: .25in;
+  }
+}
+.sag {
+  font-weight: normal;
+  font-family: monospace;
+  line-height: 1.5;
+  font-size: 10pt;
+  display: flex;
+  flex-flow: column nowrap;
+}
+@media print {
+  .sag {
+    height: {{ page_height }};
+  }
+}
+.sag h2 {
+  font-size: 12pt;
+  margin: 0;
+  display: inline;
+}
+.sag > header {
+  padding-top: 8pt;
+  padding-bottom: 6pt;
+  margin-bottom: 8pt;
+  border-top: 1px solid {{ style.border_color }};
+  border-bottom: 1px solid {{ style.border_color }};
+}
+.sag > section, .sag > table {
+  margin-top: 12pt;
+}
+.sag > section:last-of-type {
+  flex: 1 1 0;
+}
+.sag > table > tfoot > tr:first-of-type {
+  border-top: 1px solid {{ style.border_color }};
+}
+.sag > footer {
+  margin-top: 8pt;
+  border-top: 1px solid {{ style.border_color }};
+  font-family: serif;
+}
+.sag-draft-indicator {
+  font-size: 7pt;
+  padding: 1pt;
+  background-color: {{ style.border_color }};
+}
+.sag-cta {
+  font-size: 20pt;
+  font-weight: bold;
+}
+
+</style>
+
+<div class="sag">
+  {%- if doc.letter_head -%}
+  {{ frappe.db.get_value("Letter Head", doc.letter_head, "content") }}
+  {%- endif -%}
+
+  <header class="row">
+    <div class="col-xs-6">
+      <h2>
+        INVOICE: <strong>{{ doc.name }}</strong>
+        {% if doc.docstatus == 0 %}
+        <span class="sag-draft-indicator">(DRAFT)</span>
+        {% endif %}
+      </h2>
+    </div>
+    <div class="col-xs-6">
+      <p class="text-right">Date: <strong>{{ doc.posting_date }}</strong></p>
+    </div>
+  </header>
+  <div class="row">
+    <div class="col-xs-12">
+      <p>Customer ID: <strong>{{ doc.customer }}</strong></p>
+      {% set mobile_no = frappe.db.get_value('Customer', doc.customer, 'mobile_no') %}
+      {% if mobile_no and mobile_no != doc.customer %}
+      <p>Contact No: <strong>{{ mobile_no }}</strong></p>
+      {% endif %}
+    </div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Particulars</th>
+        <th class="text-right">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in doc.items %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ item.item_name }}</td>
+        <td class="text-right">{{ item.get_formatted('amount', doc) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td class="text-right" colspan="2">Total</td>
+        <td class="text-right">
+          <strong>{{ doc.get_formatted('grand_total') }}</strong>
+        </td>
+      </tr>
+      {% if doc.rounding_adjustment %}
+      <tr>
+        <td class="text-right" colspan="2">Round Off</td>
+        <td class="text-right">{{ doc.get_formatted('rounding_adjustment') }}</td>
+      </tr>
+      <tr>
+        <td class="text-right" colspan="2">Rounded Total</td>
+        <td class="text-right">
+          <strong>{{ doc.get_formatted('rounded_total') }}</strong>
+        </td>
+      </tr>
+      {% endif %}
+    </tfoot>
+  </table>
+  <section class="row">
+    <div class="col-xs-12">
+      <p>Received with thanks from <strong>{{ doc.customer_name }}</strong> a sum
+        of <strong>{{ doc.in_words|replace('.', '') }}</strong> by
+        {% for payment in doc.payments %}
+        <strong>{{ payment.mode_of_payment }}</strong>
+        {%- if payment.reference_no -%}
+        {{ ' (No. %s dt. %s)'|format(
+        payment.reference_no, payment.reference_date or '-') }}
+        {%- endif -%}
+        {%- if not loop.last -%} , {%- endif -%}
+        {%- endfor -%}.
+      </p>
+    </div>
+  </section>
+  <section class="row">
+    <div class="col-xs-12">
+      <p>RCVD:
+        <span class="sag-cta">{{ doc.get_formatted('paid_amount') }}</span>
+      </p>
+    </div>
+  </section>
+  <footer class=row>
+    <div class="col-xs-12">
+      {% block footer %}{% endblock %}
+    </div>
+  </footer>
+</div>
