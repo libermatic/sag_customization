@@ -1,15 +1,47 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from . import __version__ as app_version
+from . import __version__
 
 app_name = "sag_customization"
 app_title = "Sagolsem Customization"
+app_version = __version__
 app_publisher = "Libermatic"
 app_description = "Customizations for Sagolsem Enterprises"
 app_icon = "fa fa-mobile-alt"
 app_color = "#F44336"
 app_email = "info@libermatic.com"
 app_license = "MIT"
+
+fixtures = [
+    {
+        'doctype': 'Property Setter',
+        'filters': [['name', 'in', [
+            'Customer-customer_name-in_standard_filter',
+            'Customer-territory-in_list_view',
+            'Sales Invoice-is_pos-default',
+            'Sales Invoice-time_sheet_list-hidden',
+            'Sales Invoice-timesheets-hidden',
+            'Sales Invoice-total_net_weight-hidden',
+            'Sales Invoice-taxes_section-hidden',
+            'Sales Invoice-taxes_and_charges-hidden',
+            'Sales Invoice-shipping_rule-hidden',
+            'Sales Invoice-taxes-hidden',
+            'Sales Invoice-sec_tax_breakup-hidden',
+            'Sales Invoice-other_charges_calculation-hidden',
+            'Sales Invoice-base_total_taxes_and_charges-hidden',
+            'Sales Invoice-total_taxes_and_charges-hidden',
+            'Sales Invoice-gst_section-collapsible',
+        ]]],
+    },
+    {
+        'doctype': 'Custom Field',
+        'filters': [['name', 'in', [
+            'Customer-customer_id',
+            'Sales Invoice Payment-reference_no',
+            'Sales Invoice Payment-reference_date',
+        ]]],
+    },
+]
 
 # Includes in <head>
 # ------------------
@@ -39,7 +71,7 @@ app_license = "MIT"
 
 # website user home page (by Role)
 # role_home_page = {
-#	"Role": "home_page"
+#   "Role": "home_page"
 # }
 
 # Website user home page (by function)
@@ -61,7 +93,8 @@ app_license = "MIT"
 # ------------------
 # See frappe.core.notifications.get_notification_config
 
-# notification_config = "sag_customization.notifications.get_notification_config"
+# notification_config = \
+#   "sag_customization.notifications.get_notification_config"
 
 # Permissions
 # -----------
@@ -117,6 +150,6 @@ app_license = "MIT"
 # ------------------------------
 #
 # override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "sag_customization.event.get_events"
+#   "frappe.desk.doctype.event.event.get_events": \
+#      "sag_customization.event.get_events"
 # }
-
