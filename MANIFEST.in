@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include sag_customization *.css
+recursive-include sag_customization *.csv
+recursive-include sag_customization *.html
+recursive-include sag_customization *.ico
+recursive-include sag_customization *.js
+recursive-include sag_customization *.json
+recursive-include sag_customization *.md
+recursive-include sag_customization *.png
+recursive-include sag_customization *.py
+recursive-include sag_customization *.svg
+recursive-include sag_customization *.txt
+recursive-exclude sag_customization *.pyc
