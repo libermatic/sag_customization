@@ -30,10 +30,7 @@ fixtures = [
             'Sales Invoice-other_charges_calculation-hidden',
             'Sales Invoice-base_total_taxes_and_charges-hidden',
             'Sales Invoice-total_taxes_and_charges-hidden',
-            'Sales Invoice-gst_section-collapsible',
             'Sales Invoice Item-item_code-columns',
-            'Sales Invoice Item-description-in_list_view',
-            'Sales Invoice Item-description-columns',
             'Sales Invoice Item-qty-columns',
         ]]],
     },
@@ -41,6 +38,7 @@ fixtures = [
         'doctype': 'Custom Field',
         'filters': [['name', 'in', [
             'Customer-customer_id',
+            'Sales Invoice Item-more_description',
             'Sales Invoice Payment-reference_no',
             'Sales Invoice Payment-reference_date',
         ]]],
@@ -119,7 +117,7 @@ fixtures = [
 doc_events = {
     'Customer': {
         'autoname': 'sag_customization.doc_events.customer.autoname',
-    }
+    },
 }
 
 # Scheduled Tasks

@@ -121,9 +121,7 @@
         <td>{{ loop.index }}</td>
         <td>
           {{ item.item_name }}
-          {% if item.description and item.description != item.item_name -%}
-          ({{ item.description }})
-          {%- endif %}
+          {% if item.more_description %}- {{ item.more_description }}{% endif %}
         </td>
         <td class="text-right">{{ item.get_formatted('amount', doc) }}</td>
       </tr>
