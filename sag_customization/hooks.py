@@ -31,6 +31,10 @@ fixtures = [
             'Sales Invoice-base_total_taxes_and_charges-hidden',
             'Sales Invoice-total_taxes_and_charges-hidden',
             'Sales Invoice-gst_section-collapsible',
+            'Sales Invoice Item-item_code-columns',
+            'Sales Invoice Item-description-in_list_view',
+            'Sales Invoice Item-description-columns',
+            'Sales Invoice Item-qty-columns',
         ]]],
     },
     {
