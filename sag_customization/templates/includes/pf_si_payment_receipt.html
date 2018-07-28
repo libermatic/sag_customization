@@ -9,78 +9,102 @@
   font-weight: normal;
   font-family: monospace;
   line-height: 1.5;
-  font-size: 10pt;
+  font-size: {{ page_font_size or '10pt' }};
   display: flex;
   flex-flow: column nowrap;
 }
 @media print {
   .sag {
-    height: {{ page_height }};
+    min-height: {{ page_height }};
   }
 }
 .sag h2 {
-  font-size: 12pt;
+  font-size: 1.3em;
   margin: 0;
-  display: inline;
 }
 .sag > header {
-  padding-top: 8pt;
-  padding-bottom: 6pt;
-  margin-bottom: 8pt;
+  padding-top: 0.8em;
+  padding-bottom: 0.6em;
+  margin-bottom: 0.8em;
   border-top: 1px solid {{ style.border_color }};
   border-bottom: 1px solid {{ style.border_color }};
 }
 .sag > section, .sag > table {
-  margin-top: 12pt;
+  margin-top: 1.2em;
 }
 .sag > section:last-of-type {
   flex: 1 1 0;
+  margin-top: 2em;
 }
 .sag > table > tfoot > tr:first-of-type {
   border-top: 1px solid {{ style.border_color }};
 }
 .sag > footer {
-  margin-top: 8pt;
+  margin-top: 0.8em;
   border-top: 1px solid {{ style.border_color }};
   font-family: serif;
 }
 .sag-draft-indicator {
-  font-size: 7pt;
+  font-size: 0.7em;
   padding: 1pt;
   background-color: {{ style.border_color }};
 }
-.sag-cta {
-  font-size: 20pt;
+.sag-label {
+  font-size: 0.9em;
+}
+.sag-value {
   font-weight: bold;
+}
+.sag-cta {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+.sag-stamp {
+  padding-top: 1.2em;
+  font-size: 0.8em;
+  text-align: center;
+  font-style: italic;
 }
 
 </style>
 
+
 <div class="sag">
-  {%- if doc.letter_head -%}
+  {%- if letter_head and doc.letter_head -%}
   {{ frappe.db.get_value("Letter Head", doc.letter_head, "content") }}
   {%- endif -%}
-
   <header class="row">
     <div class="col-xs-6">
       <h2>
-        INVOICE: <strong>{{ doc.name }}</strong>
+        <strong>{{ title or 'INVOICE' }}</strong>
         {% if doc.docstatus == 0 %}
-        <span class="sag-draft-indicator">(DRAFT)</span>
+        <br /><span class="sag-draft-indicator">(DRAFT)</span>
         {% endif %}
       </h2>
     </div>
     <div class="col-xs-6">
-      <p class="text-right">Date: <strong>{{ doc.posting_date }}</strong></p>
+      <p class="text-right">
+        <strong>{{ doc.name }}</strong>
+      </p>
+      <p class="text-right">
+        Date: <strong>{{ doc.get_formatted('posting_date') }}</strong>
+      </p>
     </div>
   </header>
   <div class="row">
-    <div class="col-xs-12">
-      <p>Customer ID: <strong>{{ doc.customer }}</strong></p>
-      {% set mobile_no = frappe.db.get_value('Customer', doc.customer, 'mobile_no') %}
-      {% if mobile_no and mobile_no != doc.customer %}
-      <p>Contact No: <strong>{{ mobile_no }}</strong></p>
-      {% endif %}
+    <div class="col-xs-6">
+      <div class="sag-label">Customer ID</div>
+      <div class="sag-value">{{ doc.customer }}</div>
+    </div>
+    <div class="col-xs-6">
+      <div class="sag-label">Name</div>
+      <div class="sag-value">
+        {{ doc.customer_name }}
+        {% set mobile_no = frappe.db.get_value('Customer', doc.customer, 'mobile_no') %}
+        {% if mobile_no and mobile_no != doc.customer %}
+        <br />({{ mobile_no }})</p>
+        {% endif %}
+      </div>
     </div>
   </div>
   <table>
@@ -95,7 +119,10 @@
       {% for item in doc.items %}
       <tr>
         <td>{{ loop.index }}</td>
-        <td>{{ item.item_name }}</td>
+        <td>
+          {{ item.item_name }}
+          {% if item.more_description %}- {{ item.more_description }}{% endif %}
+        </td>
         <td class="text-right">{{ item.get_formatted('amount', doc) }}</td>
       </tr>
       {% endfor %}
@@ -123,29 +150,41 @@
   </table>
   <section class="row">
     <div class="col-xs-12">
-      <p>Received with thanks from <strong>{{ doc.customer_name }}</strong> a sum
-        of <strong>{{ doc.in_words|replace('.', '') }}</strong> by
+      <p>
+      {% if doc.status == 'Paid' %}
+        Received with thanks from <strong>{{ doc.customer_name }}</strong> a sum
+        of <strong>{{ doc.in_words|replace('.', '') }}</strong>
+        {% if doc.payments %}by{% endif %}
         {% for payment in doc.payments %}
         <strong>{{ payment.mode_of_payment }}</strong>
         {%- if payment.reference_no -%}
         {{ ' (No. %s dt. %s)'|format(
-        payment.reference_no, payment.reference_date or '-') }}
+          payment.reference_no,
+          payment.get_formatted('reference_date', doc) if payment.reference_date else '-'
+        ) }}
         {%- endif -%}
         {%- if not loop.last -%} , {%- endif -%}
         {%- endfor -%}.
+      {% else %}
+        Pending a sum of <strong>{{ doc.in_words|replace('.', '') }}</strong>
+        from <strong>{{ doc.customer_name }}</strong>.
+      {% endif %}
       </p>
     </div>
   </section>
   <section class="row">
-    <div class="col-xs-12">
-      <p>RCVD:
-        <span class="sag-cta">{{ doc.get_formatted('paid_amount') }}</span>
-      </p>
+    <div class="col-xs-7">
+      <p class="sag-cta">{{ doc.get_formatted('grand_total') }}</p>
+    </div>
+    <div class="col-xs-5">
+      <p class="sag-stamp">Receiver</p>
     </div>
   </section>
   <footer class=row>
     <div class="col-xs-12">
-      {% block footer %}{% endblock %}
+      {%- if letter_head and doc.letter_head -%}
+      {{ frappe.db.get_value("Letter Head", doc.letter_head, "footer") }}
+      {%- endif -%}
     </div>
   </footer>
 </div>
