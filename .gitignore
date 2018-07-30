@@ -4,3 +4,4 @@
 *.swp
 tags
 sag_customization/docs/current
+.ropeproject
