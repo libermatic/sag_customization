@@ -1,0 +1,138 @@
+<style>
+.sag {
+  display: flex;
+  flex-flow: column nowrap;
+  min-height: {{ page_height or '10.69in' }};
+}
+.sag > section, .sag > table {
+  font-weight: normal;
+  font-family: monospace;
+  line-height: 1.3;
+  font-size: {{ page_font_size or '10pt' }};
+}
+.sag > * {
+  margin-bottom: 1em;
+}
+.sag > :last-child {
+  margin-top: auto;
+  margin-bottom: 0;
+}
+.sag-esp {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+}
+.sag-esp h1 {
+  font-size: 1.5em;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.sag-esp dl {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0;
+}
+.sag-esp dt {
+  font-weight: normal;
+  padding-right: 1em;
+  margin: auto 0;
+}
+.sag-esp dd {
+  text-align: right;
+}
+.sag-esp-alt dd {
+  min-width: 12em;
+}
+.sag-esp-alt dl:last-of-type > * {
+  font-weight: bold;
+}
+.sag-cta {
+  font-size: 2em;
+  font-weight: bold;
+}
+.sag-note {
+  font-size: .9em;
+  padding: 0.5em;
+  max-width: calc({{ page_height or '10.69in' }} / 2.5);
+}
+</style>
+
+<div class="sag">
+  {{ letter_head or '' }}
+  <section class="sag-esp">
+    <h1>E-Ticket</h1>
+    <div>
+      <dl>
+        <dt>PNR</dt>
+        <dd class="sag-cta">{{ doc.pnr }}</dd>
+      </dl>
+      <dl>
+        <dt>Issued on</dt>
+        <dd>{{ doc.get_formatted('posting_date') }}</dd>
+      </dl>
+    </div>
+  </section>
+  <table>
+    <thead>
+      <th>Passenger Name</th>
+      <th>Reference No</th>
+      <th>Remarks</th>
+    </thead>
+    <tbody>
+      {% for passenger in doc.passengers %}
+      <tr>
+        <td>{{ passenger.salutation }} {{ passenger.passenger_name}}</td>
+        <td>{{ passenger.reference or doc.pnr }}</td>
+        <td>{{ passenger.remarks or '' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <table>
+    <thead>
+      <th>Flight</th>
+      <th>Departure</th>
+      <th>Arrival</th>
+      <th>Status</th>
+    </thead>
+    <tbody>
+      {% for plan in doc.plans %}
+      <tr>
+        <td>{{ plan.flight }}</td>
+        <td>{{ plan.departing_at }}<br />{{ plan.departing_on }}</td>
+        <td>{{ plan.arriving_at }}<br />{{ plan.arriving_on }}</td>
+        <td>{{ plan.comments }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <section class="sag-esp sag-esp-alt">
+    <div class="sag-note">
+      <p>This is an electronic ticket</p>
+      <p>Please carry a positive identification for check in.</p>
+    </div>
+    <div>
+      {% for payment in doc.payments %}
+      <dl>
+        <dt>{{ payment.charge_name}}</dt>
+        <dd>{{ payment.get_formatted('amount', doc) }}</dd>
+      </dl>
+      {% endfor %}
+      <dl>
+        <dt>Total</dt>
+        <dd>{{ doc.get_formatted('total') }}</dd>
+      </dl>
+      {% if doc.rounding_adjustment %}
+      <dl>
+        <dt>Round Off ({{ doc.get_formatted('rounding_adjustment') }})</dt>
+        <dd>{{ doc.get_formatted('rounded_total') }}</dd>
+      </dl>
+      {% endif %}
+      <p>{{ doc.in_words }}</p>
+    </div>
+  </section>
+  <section>
+    {{ doc.terms or '' }}
+  </section>
+  {{ footer or '' }}
+</div>
