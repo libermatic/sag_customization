@@ -15,13 +15,22 @@ frappe.ui.form.on('Itinerary', {
         is_group: false,
       },
     });
-    const { message: accounts = {} } = await frappe.db.get_value(
-      'Itinerary Settings',
-      null,
-      ['expense_account', 'income_account']
-    );
-    frm.set_value('expense_account', accounts['expense_account']);
-    frm.set_value('income_account', accounts['income_account']);
+    if (frm.doc.__islocal) {
+      const settings_fields = [
+        'expense_account',
+        'income_account',
+        'letter_head',
+        'terms',
+      ];
+      const { message: settings = {} } = await frappe.db.get_value(
+        'Itinerary Settings',
+        null,
+        settings_fields
+      );
+      settings_fields.forEach(field => {
+        frm.set_value(field, settings[field]);
+      });
+    }
   },
   refresh: function(frm) {
     frappe.ui.form.on('Itinerary Charge', {
